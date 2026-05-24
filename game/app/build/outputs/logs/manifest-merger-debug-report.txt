@@ -1,0 +1,77 @@
+-- Merging decision tree log ---
+manifest
+ADDED from C:\Users\Grey\Desktop\game\app\src\main\AndroidManifest.xml:2:1-22:12
+	package
+		ADDED from C:\Users\Grey\Desktop\game\app\src\main\AndroidManifest.xml:3:5-31
+		INJECTED from C:\Users\Grey\Desktop\game\app\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\Grey\Desktop\game\app\src\main\AndroidManifest.xml
+	xmlns:android
+		ADDED from C:\Users\Grey\Desktop\game\app\src\main\AndroidManifest.xml:2:11-69
+uses-permission#android.permission.RECORD_AUDIO
+ADDED from C:\Users\Grey\Desktop\game\app\src\main\AndroidManifest.xml:5:5-71
+	android:name
+		ADDED from C:\Users\Grey\Desktop\game\app\src\main\AndroidManifest.xml:5:22-68
+application
+ADDED from C:\Users\Grey\Desktop\game\app\src\main\AndroidManifest.xml:7:5-20:19
+MERGED from [com.android.support:support-compat:28.0.0] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\com.android.support\support-compat\28.0.0\AndroidManifest.xml:22:5-94
+MERGED from [com.android.support:versionedparcelable:28.0.0] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\com.android.support\versionedparcelable\28.0.0\AndroidManifest.xml:22:5-23:19
+	android:label
+		ADDED from C:\Users\Grey\Desktop\game\app\src\main\AndroidManifest.xml:10:9-41
+	android:appComponentFactory
+		ADDED from [com.android.support:support-compat:28.0.0] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\com.android.support\support-compat\28.0.0\AndroidManifest.xml:22:18-91
+	android:allowBackup
+		ADDED from C:\Users\Grey\Desktop\game\app\src\main\AndroidManifest.xml:8:9-35
+	android:icon
+		ADDED from C:\Users\Grey\Desktop\game\app\src\main\AndroidManifest.xml:9:9-43
+activity#experiment3.game.MainActivity
+ADDED from C:\Users\Grey\Desktop\game\app\src\main\AndroidManifest.xml:11:9-19:20
+	android:screenOrientation
+		ADDED from C:\Users\Grey\Desktop\game\app\src\main\AndroidManifest.xml:14:13-50
+	android:label
+		ADDED from C:\Users\Grey\Desktop\game\app\src\main\AndroidManifest.xml:13:13-45
+	android:name
+		ADDED from C:\Users\Grey\Desktop\game\app\src\main\AndroidManifest.xml:12:13-41
+intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
+ADDED from C:\Users\Grey\Desktop\game\app\src\main\AndroidManifest.xml:15:13-18:29
+action#android.intent.action.MAIN
+ADDED from C:\Users\Grey\Desktop\game\app\src\main\AndroidManifest.xml:16:17-69
+	android:name
+		ADDED from C:\Users\Grey\Desktop\game\app\src\main\AndroidManifest.xml:16:25-66
+category#android.intent.category.LAUNCHER
+ADDED from C:\Users\Grey\Desktop\game\app\src\main\AndroidManifest.xml:17:17-77
+	android:name
+		ADDED from C:\Users\Grey\Desktop\game\app\src\main\AndroidManifest.xml:17:27-74
+uses-sdk
+INJECTED from C:\Users\Grey\Desktop\game\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
+MERGED from [com.android.support:appcompat-v7:28.0.0] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\28.0.0\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-fragment:28.0.0] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\com.android.support\support-fragment\28.0.0\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:animated-vector-drawable:28.0.0] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\com.android.support\animated-vector-drawable\28.0.0\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-vector-drawable:28.0.0] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\com.android.support\support-vector-drawable\28.0.0\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-core-ui:28.0.0] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\com.android.support\support-core-ui\28.0.0\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-core-utils:28.0.0] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\com.android.support\support-core-utils\28.0.0\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:documentfile:28.0.0] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\com.android.support\documentfile\28.0.0\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:loader:28.0.0] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\com.android.support\loader\28.0.0\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:livedata:1.1.1] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\android.arch.lifecycle\livedata\1.1.1\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:livedata-core:1.1.1] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\android.arch.lifecycle\livedata-core\1.1.1\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.core:runtime:1.1.1] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\android.arch.core\runtime\1.1.1\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:viewmodel:1.1.1] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\android.arch.lifecycle\viewmodel\1.1.1\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:localbroadcastmanager:28.0.0] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\com.android.support\localbroadcastmanager\28.0.0\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:print:28.0.0] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\com.android.support\print\28.0.0\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:viewpager:28.0.0] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\com.android.support\viewpager\28.0.0\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:coordinatorlayout:28.0.0] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\com.android.support\coordinatorlayout\28.0.0\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:drawerlayout:28.0.0] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\com.android.support\drawerlayout\28.0.0\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:slidingpanelayout:28.0.0] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\com.android.support\slidingpanelayout\28.0.0\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:customview:28.0.0] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\com.android.support\customview\28.0.0\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:swiperefreshlayout:28.0.0] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\com.android.support\swiperefreshlayout\28.0.0\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:interpolator:28.0.0] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\com.android.support\interpolator\28.0.0\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:asynclayoutinflater:28.0.0] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\com.android.support\asynclayoutinflater\28.0.0\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-compat:28.0.0] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\com.android.support\support-compat\28.0.0\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:runtime:1.1.1] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\android.arch.lifecycle\runtime\1.1.1\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:versionedparcelable:28.0.0] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\com.android.support\versionedparcelable\28.0.0\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:cursoradapter:28.0.0] C:\Users\Grey\Desktop\game\app\build\intermediates\exploded-aar\com.android.support\cursoradapter\28.0.0\AndroidManifest.xml:20:5-44
+	android:targetSdkVersion
+		INJECTED from C:\Users\Grey\Desktop\game\app\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\Grey\Desktop\game\app\src\main\AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from C:\Users\Grey\Desktop\game\app\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\Grey\Desktop\game\app\src\main\AndroidManifest.xml

@@ -1,0 +1,22 @@
+[
+    {
+        "merged": "C:\\Users\\Grey\\Desktop\\game\\app\\build\\intermediates\\res\\merged\\debug\\raw\\contact.wav",
+        "source": "C:\\Users\\Grey\\Desktop\\game\\app\\src\\main\\res\\raw\\contact.wav"
+    },
+    {
+        "merged": "C:\\Users\\Grey\\Desktop\\game\\app\\build\\intermediates\\res\\merged\\debug\\raw\\jiaosheng.wav",
+        "source": "C:\\Users\\Grey\\Desktop\\game\\app\\src\\main\\res\\raw\\jiaosheng.wav"
+    },
+    {
+        "merged": "C:\\Users\\Grey\\Desktop\\game\\app\\build\\intermediates\\res\\merged\\debug\\raw\\jump.wav",
+        "source": "C:\\Users\\Grey\\Desktop\\game\\app\\src\\main\\res\\raw\\jump.wav"
+    },
+    {
+        "merged": "C:\\Users\\Grey\\Desktop\\game\\app\\build\\intermediates\\res\\merged\\debug\\raw\\select.wav",
+        "source": "C:\\Users\\Grey\\Desktop\\game\\app\\src\\main\\res\\raw\\select.wav"
+    },
+    {
+        "merged": "C:\\Users\\Grey\\Desktop\\game\\app\\build\\intermediates\\res\\merged\\debug\\raw\\schnappi.mp3",
+        "source": "C:\\Users\\Grey\\Desktop\\game\\app\\src\\main\\res\\raw\\schnappi.mp3"
+    }
+]
