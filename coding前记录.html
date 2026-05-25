@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YellingMan 项目记录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            line-height: 1.7;
+            color: #333;
+            background-color: #f5f7fa;
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+        h2 {
+            color: #3498db;
+            margin: 25px 0 15px;
+            padding-left: 10px;
+            border-left: 4px solid #3498db;
+        }
+        h3 {
+            color: #2980b9;
+            margin: 20px 0 10px;
+        }
+        p {
+            margin: 10px 0;
+        }
+        ul, ol {
+            margin: 10px 0 10px 30px;
+        }
+        .note {
+            background-color: #fff3cd;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 15px 0;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        .card {
+            background-color: white;
+            padding: 18px;
+            border-radius: 8px;
+            margin: 15px 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+        .en {
+            color: #6c757d;
+            font-style: italic;
+        }
+        .zh {
+            margin: 8px 0 15px 0;
+        }
+        strong {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+        .recommend {
+            background-color: #d1f7e0;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #28a745;
+        }
+    </style>
+</head>
+<body>
+    <h1>YellingMan 项目记录</h1>
+
+    <div class="note">
+        ⎿ API错误：API返回了一个空或格式错误的响应（HTTP 200）— 检查是否有代理或网关拦截请求<br>
+        ⎿ 提示：使用 /agents 来优化特定任务。例如：软件架构师、代码编写者、代码审查员
+    </div>
+
+    <h2>一、项目现状分析（客户端+后端）</h2>
+    <div class="card">
+        <p class="en">● No, it's not fully complete, finished, or runnable in its current state. Here's a breakdown:</p>
+        <p class="zh">● 不，这在当前状态下并不完全完整、完成或可运行。以下是详细信息：</p>
+
+        <h3>游戏客户端 (myHack2016)</h3>
+        <ul>
+            <li class="en">Desktop launcher passes new Yelling() with no callback, so calling getMyLevel() at runtime will throw a NullPointerException. The Android launcher correctly wires the mic-based JumpLevel callback.</li>
+            <li class="zh">桌面启动器传递新的 Yelling()，没有回调，因此在运行时调用 getMyLevel() 会抛出 NullPointerException。Android 启动器正确连接了基于麦克风的 JumpLevel 回调。</li>
+
+            <li class="en">Levels 1 and 2 on the menu screen have their game-launch code commented out — only level 0 is playable.</li>
+            <li class="zh">菜单屏幕上的第 1 和第 2 级的游戏启动代码已被注释掉 — 只有第 0 级可玩。</li>
+
+            <li class="en">YellingRobot.java is imported in GameScreen but never instantiated or used. Dead code.</li>
+            <li class="zh">YellingRobot.java 在 GameScreen 中被导入，但从未实例化或使用。死代码。</li>
+
+            <li class="en">The project uses Gradle + LibGDX from 2016 — you'd need a compatible Android SDK and build toolchain from that era to compile.</li>
+            <li class="zh">项目使用的是 2016 年的 Gradle + LibGDX — 您需要一个兼容的 Android SDK 和来自那个时代的构建工具链才能编译。</li>
+        </ul>
+
+        <h3>后端 (restfulapi)</h3>
+        <ul>
+            <li class="en">The database points to a remote MySQL server at 182.254.154.138 which is almost certainly unreachable now.</li>
+            <li class="zh">数据库指向位于 182.254.154.138 的远程 MySQL 服务器，现在几乎肯定无法访问。</li>
+
+            <li class="en">Music and Record API view files are blank — those endpoints do nothing.</li>
+            <li class="zh">音乐和记录 API 视图文件为空 — 这些端点没有任何作用。</li>
+
+            <li class="en">User API is partial: only POST /user/<id> actually works (register). GET/PUT/DELETE are stubs returning raw data or placeholder strings.</li>
+            <li class="zh">用户 API 是部分的：只有 POST /user/<id> 实际有效（注册）。GET/PUT/DELETE 是返回原始数据或占位符字符串的存根。</li>
+
+            <li class="en">Uses deprecated flask.ext.* imports (Flask pre-1.0 style).</li>
+            <li class="zh">使用了已弃用的 flask.ext.* 导入（Flask 1.0 之前的样式）。</li>
+        </ul>
+
+        <p class="en"><strong>Verdict:</strong> It's a hackathon prototype — some core path works (Android level 0 with voice control), but significant parts are stubbed, commented out, or depend on infrastructure that no longer exists.</p>
+        <p class="zh"><strong>结论：</strong>这是一个黑客马拉松原型 — 一些核心路径有效（具有语音控制的 Android 级别 0），但重要部分被存根、注释掉或依赖于不再存在的基础设施。</p>
+    </div>
+
+    <h2>二、代码价值判断：重写优于维护</h2>
+    <div class="card">
+        <p class="en">● Honestly, no. Here's why:</p>
+        <p class="zh">● 说实话，不。原因如下：</p>
+
+        <p class="en">The code itself isn't worth saving. The tech stack is a decade old (LibGDX 2016, Flask pre-1.0, Python 2-era MySQL drivers). The comments are scrambled from encoding corruption. The architecture is glued together — the desktop launcher crashes on startup, two API endpoints are blank files, and the database points to a server that no longer exists.</p>
+        <p class="zh">代码本身不值得保存。技术栈已经有十年历史（LibGDX 2016，Flask 1.0之前，Python 2时代的MySQL驱动）。注释因编码损坏而混乱。架构是拼凑起来的——桌面启动器在启动时崩溃，两个API端点是空文件，数据库指向一个已经不存在的服务器。</p>
+
+        <p class="en">The idea is worth keeping. A voice-volume-controlled parkour game is genuinely creative and fun. The core gameplay loop (mic → decibel level → jump force → physics movement) works on Android. That's the valuable part.</p>
+        <p class="zh">这个想法值得保留。一个声音控制的跑酷游戏确实富有创意且有趣。核心游戏循环（麦克风 → 分贝级别 → 跳跃力量 → 物理运动）在Android上是可行的。这才是有价值的部分。</p>
+
+        <p class="en">What makes more sense: If you want the game again, rebuild it from scratch with modern tools (Godot, Unity, or a current LibGDX version). The physics parameters, the map layouts, and the volume-to-jump mapping are the real assets — those take design iteration, not debugging. A rewrite would be faster than untangling this codebase, and you'd end up with something maintainable.</p>
+        <p class="zh">更有意义的是：如果你想再次拥有这个游戏，使用现代工具（Godot，Unity或当前的LibGDX版本）从头开始重建它。物理参数、地图布局和音量到跳跃的映射才是真正的资产——这些需要设计迭代，而不是调试。重写将比理清这个代码库更快，而且你将得到一个可维护的东西。</p>
+    </div>
+
+    <h2>三、重建方向：纯Android Java开发</h2>
+    <div class="card">
+        <p>现在我明白了全貌。你正在学习的内容是：<strong>纯 Android Java，使用 SurfaceView/Canvas</strong>——没有游戏引擎，没有 LibGDX，没有后端。核心是手动游戏循环、精灵绘制、简单碰撞。</p>
+
+        <p><strong>第一步：提取旧项目核心设计（重建前必做）</strong></p>
+        <ol>
+            <li><strong>音量-跳跃映射</strong>：JumpLevel.java逻辑 → 8000Hz采样麦克风、PCM计算分贝、4级跳跃（0=不跳/1=小跳/2=中跳/3=大跳）。</li>
+            <li><strong>游戏规则</strong>：角色自动右跑（速度1.2f）、仅声音控跳跃、收集星星、碰障碍/掉出屏幕死亡、到达地图右端获胜。</li>
+            <li><strong>地图布局</strong>：从level0.tmx（XML）提取地面、障碍、星星位置。</li>
+        </ol>
+    </div>
+
+    <h2>四、设计规范（DESIGN_SPEC.md）核心内容</h2>
+    <div class="card">
+        <p>规范已编写完成，核心如下：</p>
+        <h3>1. 从旧项目提取</h3>
+        <ul>
+            <li>精准音量采样管道（8000Hz PCM → 平方和 → 分贝 → 4级跳跃）</li>
+            <li>游戏规则（自动跑、仅地面跳跃、3种死亡条件、边缘获胜）</li>
+            <li>适配.tmx文件的关卡布局格式</li>
+        </ul>
+
+        <h3>2. 适配课堂要求</h3>
+        <ul>
+            <li>架构：SurfaceView → MainThread → Canvas绘制 → 角色精灵</li>
+            <li>7个功能界面：主菜单、选关、游戏、暂停、结束、胜利、高分</li>
+            <li>无Box2D/LibGDX：矩形碰撞；无后端：本地SQLite存分数</li>
+        </ul>
+
+        <h3>3. 关键简化</h3>
+        <ul>
+            <li>GameState枚举管理游戏状态</li>
+            <li>地图数据硬编码（替代.tmx解析）</li>
+            <li>重力+矩形碰撞替代Box2D物理</li>
+            <li>单Activity+单SurfaceView架构</li>
+        </ul>
+    </div>
+
+    <h2>五、功能扩展：三层难度设计</h2>
+    <div class="card">
+        <p>语音控制是核心亮点，分层扩展提升游戏深度：</p>
+        <h3>第一层（低努力、高影响·必加）</h3>
+        <ul>
+            <li>组合得分：连续收集星星触发倍数加成，失误重置</li>
+            <li>语音校准：首次启动适配个人音域，设置分贝阈值</li>
+            <li>屏幕震动：3级大喊时画面抖动，增强反馈</li>
+        </ul>
+
+        <h3>第二层（中等努力·脱颖而出）</h3>
+        <ul>
+            <li>持续大喊滑翔：高音量超1秒触发滑翔/漂浮</li>
+            <li>低声蹲下：极安静音量触发蹲下躲高障碍</li>
+            <li>能量星星：稀有星星触发特殊效果（扩音器/静音/磁铁）</li>
+        </ul>
+
+        <h3>第三层（高难度·加分项）</h3>
+        <ul>
+            <li>关卡Boss：持续高声摧毁大型障碍，实时音量计</li>
+            <li>动态背景：声音触发背景元素变化（鸟飞/云散/树摇）</li>
+        </ul>
+    </div>
+
+    <h2>六、旧设备适配：功能取舍建议</h2>
+    <div class="card">
+        <p>适配AS 2.2 + API 15，平衡稳定性与演示效果：</p>
+        <h3>跳过（复杂/不可靠）</h3>
+        <ul>
+            <li>低声蹲下：旧设备麦克风噪声差异大，API15不可靠</li>
+            <li>能量星星：状态多、边缘场景复杂，难稳定演示</li>
+            <li>Boss遭遇：独立模式，开发成本高</li>
+            <li>动态背景：API15位图渲染繁琐，性能差</li>
+        </ul>
+
+        <h3>必做（简单+高价值）</h3>
+        <table style="width:100%;margin:10px 0;border-collapse:collapse;">
+            <tr style="background:#f2f2f2;">
+                <th style="padding:8px;border:1px solid #ddd;">特性</th>
+                <th style="padding:8px;border:1px solid #ddd;">价值</th>
+            </tr>
+            <tr>
+                <td style="padding:8px;border:1px solid #ddd;">屏幕震动</td>
+                <td style="padding:8px;border:1px solid #ddd;">3行代码实现，提升趣味性</td>
+            </tr>
+            <tr>
+                <td style="padding:8px;border:1px solid #ddd;">连击得分</td>
+                <td style="padding:8px;border:1px solid #ddd;">简单逻辑，支撑游戏奖励循环</td>
+            </tr>
+            <tr>
+                <td style="padding:8px;border:1px solid #ddd;">声音校准</td>
+                <td style="padding:8px;border:1px solid #ddd;">解决声音差异，技术亮点</td>
+            </tr>
+        </table>
+
+        <h3>可选（时间允许添加）</h3>
+        <ul>
+            <li>持续吼叫滑翔：唯一实用二级特性，增加“短爆发/持续努力”双机制</li>
+        </ul>
+    </div>
+
+    <h2>七、最终推荐特性集</h2>
+    <div class="recommend">
+        <ul>
+            <li><strong>核心</strong>：4级声音跳跃（基础玩法）</li>
+            <li><strong>打磨</strong>：连击得分 + 屏幕震动 + 声音校准（差异化亮点）</li>
+            <li><strong>扩展</strong>：持续吼叫滑翔（双语音机制）</li>
+        </ul>
+        <p><strong>总结</strong>：4个声音驱动系统，兼顾简单性与创新性，适配旧设备且易演示，远优于普通学生项目。</p>
+    </div>
+</body>
+</html>

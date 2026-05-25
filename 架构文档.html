@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YellingMan 架构文档</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', "Microsoft YaHei", Arial, sans-serif;
+        }
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #3498db;
+            margin: 30px 0 15px;
+            padding-left: 8px;
+            border-left: 4px solid #3498db;
+        }
+        h3 {
+            color: #2980b9;
+            margin: 20px 0 10px;
+        }
+        pre {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            margin: 15px 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        code {
+            background-color: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: white;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        ul, ol {
+            margin: 10px 0 10px 30px;
+        }
+        li {
+            margin: 8px 0;
+        }
+        .architecture-diagram {
+            font-family: 'Consolas', 'Monaco', monospace;
+            line-height: 1.4;
+        }
+        .state-machine-diagram {
+            font-family: 'Consolas', 'Monaco', monospace;
+            line-height: 1.4;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>YellingMan 架构文档</h1>
+
+        <h2>项目结构</h2>
+        <pre>
+game/
+├── build.gradle                          # AGP 2.2.3，阿里云镜像
+├── settings.gradle                       # ':app' 模块
+├── app/
+│   ├── build.gradle                      # SDK 28，最低支持 16，兼容库 appcompat-v7:28.0.0
+│   ├── proguard-project.txt
+│   └── src/main/
+│       ├── AndroidManifest.xml           # 录音权限，强制横屏
+│       ├── java/experiment3/game/
+│       │   ├── MainActivity.java         # 入口，全屏 + 加载 GameView
+│       │   ├── GameView.java             # ★ 核心引擎 — SurfaceView，处理所有状态/渲染/输入
+│       │   ├── MainThread.java           # 游戏循环线程（锁定画布 → 更新 → 绘制 → 解锁）
+│       │   ├── GameState.java            # 枚举：校准、菜单、选关、游戏中、暂停、死亡、胜利
+│       │   ├── SoundMeter.java           # 音频录制封装 + 校准数据持久化
+│       │   ├── LevelData.java            # 3 个关卡硬编码（瓦片地图、星星、障碍、提示）
+│       │   ├── Player.java               # 角色物理、5帧精灵动画
+│       │   ├── Star.java                 # 可收集星星、旋转动画
+│       │   ├── Obstacle.java             # 地面/浮空障碍、浮动动画
+│       │   └── ScoreDBHelper.java        # SQLite 高分存储
+│       └── res/
+│           ├── drawable/                 # 启动图、背景图、角色图、星星图、障碍图、按钮图
+│           ├── raw/                      # 音效文件：碰撞、喊叫、跳跃、背景音乐、选择音
+│           └── values/                   # 字符串、全屏样式
+        </pre>
+
+        <h2>系统架构</h2>
+        <pre class="architecture-diagram">
+┌──────────────────────────────────────────────────────────────────┐
+│                        MainActivity                              │
+│  setContentView(new GameView(this))                              │
+└────────────────────┬─────────────────────────────────────────────┘
+                     │
+┌────────────────────▼─────────────────────────────────────────────┐
+│                      GameView (SurfaceView)                       │
+│                                                                   │
+│  ┌─────────────┐   ┌──────────────┐   ┌──────────────────────┐  │
+│  │  MainThread  │   │  SoundMeter  │   │  GameState 状态机   │  │
+│  │  (游戏循环)  │   │  (麦克风输入)│   │  CALIBRATE→MENU→     │  │
+│  │              │   │              │   │  SELECT→PLAYING→     │  │
+│  │ update()     │   │ getJumpLvl() │   │  PAUSED/DEAD/VICTORY │  │
+│  │ draw()       │   │              │   │                      │  │
+│  └──────┬───────┘   └──────┬───────┘   └──────────┬───────────┘  │
+│         │                  │                       │              │
+│  ┌──────▼──────────────────▼───────────────────────▼───────────┐ │
+│  │                    游戏世界                                    │ │
+│  │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌────────────┐  │ │
+│  │  │  Player  │  │  Star[]  │  │Obstacle[]│  │  LevelData  │  │ │
+│  │  │  物理系统 │  │  收集判定 │  │  碰撞判定 │  │  地图数据 │  │ │
+│  │  └──────────┘  └──────────┘  └──────────┘  └────────────┘  │ │
+│  └─────────────────────────────────────────────────────────────┘ │
+│                                                                   │
+│  ┌────────────────────────────────────────────────────────────┐  │
+│  │  数据持久化                                                   │  │
+│  │  ┌──────────────────┐  ┌────────────────────────────────┐  │  │
+│  │  │ SharedPreferences│  │  ScoreDBHelper (SQLite)         │  │  │
+│  │  │ • 校准阈值        │  │  • 分数表(编号,关卡,分数,时间)│  │  │
+│  │  │ • 最高连击等级    │  │  • 插入分数 / 获取最高分       │  │  │
+│  │  └──────────────────┘  └────────────────────────────────┘  │  │
+│  └────────────────────────────────────────────────────────────┘  │
+└──────────────────────────────────────────────────────────────────┘
+        </pre>
+
+        <h2>状态机</h2>
+        <pre class="state-machine-diagram">
+                  ┌──────────────────────────────────────┐
+                  │                                      │
+        ┌─── 启动应用 ──► 校准 ──► 主菜单                │
+        │                    (3个阶段)    │   │             │
+        │                                  │   │             │
+        │                    ┌─────────────┘   │             │
+        │                    ▼                  │             │
+        │                  选关 ◄─────────────┘             │
+        │                    │                                │
+        │                    ▼                                │
+        │                 游戏中 ──► 暂停 ──► 游戏中        │
+        │                    │           │                     │
+        │                    │           ▼                     │
+        │                    │         选关                   │
+        │                    │                                │
+        │               ┌────┴────┐                          │
+        │               ▼         ▼                          │
+        │             死亡     胜利                          │
+        │               │         │                          │
+        │               ▼         ▼                          │
+        │           游戏中    选关/下一关                    │
+        │           (重玩)    (下一关 / 返回选关)            │
+        │                                                    │
+        └────────────────────────────────────────────────┘
+        </pre>
+
+        <h3>状态转换表</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>当前状态</th>
+                    <th>目标状态</th>
+                    <th>触发条件</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>校准</td>
+                    <td>主菜单</td>
+                    <td>3阶段校准完成</td>
+                </tr>
+                <tr>
+                    <td>主菜单</td>
+                    <td>游戏中</td>
+                    <td>点击开始（进入未通关关卡）</td>
+                </tr>
+                <tr>
+                    <td>主菜单</td>
+                    <td>选关</td>
+                    <td>点击关卡按钮</td>
+                </tr>
+                <tr>
+                    <td>选关</td>
+                    <td>游戏中</td>
+                    <td>点击关卡按钮</td>
+                </tr>
+                <tr>
+                    <td>选关</td>
+                    <td>主菜单</td>
+                    <td>点击空白区域</td>
+                </tr>
+                <tr>
+                    <td>游戏中</td>
+                    <td>暂停</td>
+                    <td>点击暂停按钮</td>
+                </tr>
+                <tr>
+                    <td>暂停</td>
+                    <td>游戏中</td>
+                    <td>点击继续按钮</td>
+                </tr>
+                <tr>
+                    <td>暂停</td>
+                    <td>游戏中</td>
+                    <td>点击重玩按钮（重载关卡）</td>
+                </tr>
+                <tr>
+                    <td>暂停</td>
+                    <td>选关</td>
+                    <td>点击退出按钮</td>
+                </tr>
+                <tr>
+                    <td>游戏中</td>
+                    <td>死亡</td>
+                    <td>掉落地图 / 碰到障碍</td>
+                </tr>
+                <tr>
+                    <td>死亡</td>
+                    <td>游戏中</td>
+                    <td>点击重试按钮</td>
+                </tr>
+                <tr>
+                    <td>死亡</td>
+                    <td>选关</td>
+                    <td>点击退出按钮</td>
+                </tr>
+                <tr>
+                    <td>游戏中</td>
+                    <td>胜利</td>
+                    <td>穿过终点线</td>
+                </tr>
+                <tr>
+                    <td>胜利</td>
+                    <td>游戏中</td>
+                    <td>点击下一关按钮</td>
+                </tr>
+                <tr>
+                    <td>胜利</td>
+                    <td>选关</td>
+                    <td>点击完成/退出按钮</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>游戏循环（MainThread）</h2>
+        <pre>
+while (running):
+    canvas = surfaceHolder.lockCanvas()
+    synchronized (surfaceHolder):
+        gameView.update()      // 帧率 60 帧/秒
+        gameView.draw(canvas)
+    surfaceHolder.unlockCanvasAndPost(canvas)
+        </pre>
+        <p><code>update()</code> 分发到当前状态处理逻辑。只有 <code>PLAYING（游戏中）</code> 状态每帧执行物理、碰撞、计分逻辑；其他状态为空闲或定时器驱动。</p>
+
+        <h2>游戏中状态 — 每帧更新流程</h2>
+        <ol>
+            <li>从 SoundMeter 获取跳跃等级</li>
+            <li>角色在地面 且 跳跃等级>0 → 执行对应等级跳跃</li>
+            <li>跳跃等级为3 → 开启10帧屏幕震动</li>
+            <li>更新角色物理（重力、速度、动画）</li>
+            <li>检测地面碰撞（射线检测角色下方瓦片）</li>
+            <li>检测星星碰撞（矩形相交 → 收集、连击+1）</li>
+            <li>检测障碍碰撞（矩形相交 → 角色死亡、切换状态）</li>
+            <li>检测：角色Y坐标超过地图高度 → 死亡</li>
+            <li>检测：角色X坐标超过终点瓦片 → 胜利（保存分数、更新进度）</li>
+            <li>更新相机偏移（地图滚动）</li>
+            <li>更新连击计时器 / 提示计时器 / 震动效果</li>
+        </ol>
+
+        <h2>语音处理流程</h2>
+        <pre>
+麦克风（8000Hz，16位PCM）
+    │
+    ▼
+AudioRecord.read() ──► short[] 音频缓冲区
+    │
+    ▼
+计算RMS → 分贝 = 10 * log10(平均值) （SoundMeter线程，每50ms执行）
+    │
+    ▼
+读取校准阈值（来自SharedPreferences）
+    │  阈值1 = 安静分贝 + 范围 * 0.30
+    │  阈值2 = 安静分贝 + 范围 * 0.60
+    │  阈值3 = 安静分贝 + 范围 * 0.85
+    ▼
+跳跃等级：0=静音  1=小声  2=中声  3=大声
+    │
+    ▼
+Player.jump(等级):
+    垂直速度 = 跳跃速度数组[等级]     {0, -420, -620, -820}
+    标记为非地面状态
+        </pre>
+
+        <h2>校准流程</h2>
+        <ol>
+            <li>阶段0："请用正常音量说话"（3秒）→ 记录正常说话最低分贝</li>
+            <li>阶段1："请大声喊叫！"（3秒）→ 记录大喊最高分贝</li>
+            <li>阶段2："校准完成！"（2秒）→ 计算阈值、保存到本地 → 自动进入主菜单</li>
+        </ol>
+        <p>每次启动都会执行校准，适配环境噪音变化。</p>
+
+        <h2>物理参数</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>参数</th>
+                    <th>数值</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>重力加速度</td>
+                    <td>1600 像素/秒²</td>
+                </tr>
+                <tr>
+                    <td>自动奔跑速度</td>
+                    <td>250 像素/秒</td>
+                </tr>
+                <tr>
+                    <td>跳跃速度</td>
+                    <td>等级0=0，1=-420，2=-620，3=-820 像素/秒</td>
+                </tr>
+                <tr>
+                    <td>地面Y坐标</td>
+                    <td>距离顶部 560 像素</td>
+                </tr>
+                <tr>
+                    <td>地图高度</td>
+                    <td>720 像素（死亡线）</td>
+                </tr>
+                <tr>
+                    <td>瓦片尺寸</td>
+                    <td>64 像素</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>精灵资源</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>资源名</th>
+                    <th>来源</th>
+                    <th>尺寸</th>
+                    <th>用途</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>yellingman.png</td>
+                    <td>旧项目</td>
+                    <td>300×60（5帧×60×60像素）</td>
+                    <td>角色动画</td>
+                </tr>
+                <tr>
+                    <td>stars.png</td>
+                    <td>旧项目</td>
+                    <td>可变尺寸（24像素/帧）</td>
+                    <td>可收集星星</td>
+                </tr>
+                <tr>
+                    <td>s_patch.png</td>
+                    <td>旧项目</td>
+                    <td>32×32 像素</td>
+                    <td>地面/浮空障碍</td>
+                </tr>
+                <tr>
+                    <td>gamebg.png</td>
+                    <td>旧项目</td>
+                    <td>适配屏幕高度</td>
+                    <td>视差滚动背景</td>
+                </tr>
+                <tr>
+                    <td>init.png</td>
+                    <td>旧项目</td>
+                    <td>适配屏幕尺寸</td>
+                    <td>主菜单背景</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>分数与连击系统</h2>
+        <ul>
+            <li>单颗星星基础分：100 分</li>
+            <li>连击规则：2秒内连续收集星星触发倍数加成</li>
+            <li>分数计算：100 × 连击数</li>
+            <li>连击重置：超过2秒未收集星星，连击清零</li>
+            <li>特效：收集星星位置显示浮动"x3!"文字（0.6秒渐隐）</li>
+            <li>分数保存：仅通关胜利时保存分数，中途死亡不保存</li>
+        </ul>
+
+        <h2>数据持久化</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>存储内容</th>
+                    <th>存储方式</th>
+                    <th>用途</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>安静分贝、大喊分贝、校准状态</td>
+                    <td>SharedPreferences（yellingman_cal）</td>
+                    <td>语音校准阈值</td>
+                </tr>
+                <tr>
+                    <td>最高通关关卡</td>
+                    <td>SharedPreferences（yellingman_progress）</td>
+                    <td>开始按钮默认目标关卡</td>
+                </tr>
+                <tr>
+                    <td>分数表</td>
+                    <td>SQLite（yellingman_scores.db）</td>
+                    <td>各关卡最高分记录</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>屏幕震动效果</h2>
+        <ul>
+            <li>触发条件：跳跃等级为3（大喊）起跳时</li>
+            <li>持续时间：10帧（约167毫秒）</li>
+            <li>震动强度：最大6像素，线性衰减</li>
+            <li>实现方式：绘制时通过 canvas.translate 随机偏移画布</li>
+        </ul>
+
+        <h2>关卡设计理念</h2>
+        <p>完整瓦片地图详见 <code>LevelData.java</code> 和 <code><a href="设计说明.html">设计说明</a></code>。</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>关卡</th>
+                    <th>主题</th>
+                    <th>星星数</th>
+                    <th>障碍数</th>
+                    <th>浮空障碍</th>
+                    <th>提示</th>
+                    <th>最高连击</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>新手入门（教学关）</td>
+                    <td>12</td>
+                    <td>4</td>
+                    <td>0</td>
+                    <td>7条提示</td>
+                    <td>x3</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>声音控制</td>
+                    <td>18</td>
+                    <td>8</td>
+                    <td>4</td>
+                    <td>7条提示</td>
+                    <td>x5</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>终极挑战</td>
+                    <td>28</td>
+                    <td>12</td>
+                    <td>6</td>
+                    <td>无</td>
+                    <td>x8</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>编译配置</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>配置项</th>
+                    <th>数值</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>AGP 版本</td>
+                    <td>2.2.3</td>
+                </tr>
+                <tr>
+                    <td>Gradle 版本</td>
+                    <td>2.14.1</td>
+                </tr>
+                <tr>
+                    <td>编译 SDK 版本</td>
+                    <td>28</td>
+                </tr>
+                <tr>
+                    <td>最低支持 SDK</td>
+                    <td>16</td>
+                </tr>
+                <tr>
+                    <td>目标 SDK 版本</td>
+                    <td>28</td>
+                </tr>
+                <tr>
+                    <td>构建工具版本</td>
+                    <td>28.0.3</td>
+                </tr>
+                <tr>
+                    <td>兼容库版本</td>
+                    <td>appcompat-v7:28.0.0（不含矢量图）</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

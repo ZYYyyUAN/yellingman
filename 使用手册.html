@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YellingMan 使用手册</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background-color: #f8f9fa;
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+
+        h2 {
+            color: #3498db;
+            margin: 25px 0 15px;
+            padding-left: 10px;
+            border-left: 4px solid #3498db;
+        }
+
+        h3 {
+            color: #2980b9;
+            margin: 20px 0 10px;
+        }
+
+        p {
+            margin: 10px 0;
+        }
+
+        ul, ol {
+            margin: 10px 0 10px 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background-color: #f5f9ff;
+        }
+
+        pre {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: "Consolas", "Monaco", monospace;
+        }
+
+        strong {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+
+        .faq-item {
+            margin: 15px 0;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .faq-question {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .level-card {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-left: 5px solid;
+        }
+
+        .level-1 {
+            border-left-color: #2ecc71;
+        }
+
+        .level-2 {
+            border-left-color: #f39c12;
+        }
+
+        .level-3 {
+            border-left-color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <h1>YellingMan 使用手册</h1>
+
+    <h2>1. 游戏简介</h2>
+    <p>YellingMan 是一款<strong>声音控制跑酷游戏</strong>。玩家通过对着手机麦克风喊叫来控制小人的跳跃高度，躲避障碍物、收集星星、抵达终点。</p>
+    <ul>
+        <li>无需触屏操作跳跃</li>
+        <li>声音越大，跳得越高</li>
+        <li>连续收集星星获得 Combo 加分</li>
+    </ul>
+
+    <h2>2. 运行环境</h2>
+    <ul>
+        <li>Android 4.1（API 16）及以上</li>
+        <li>需要麦克风权限</li>
+        <li>推荐在真机上运行（模拟器麦克风可能无法正常使用）</li>
+    </ul>
+
+    <h2>3. 首次启动：语音校准</h2>
+    <p>首次启动进入<strong>校准界面</strong>，用于适配个人声音特点：</p>
+    <table>
+        <thead>
+            <tr>
+                <th>阶段</th>
+                <th>操作</th>
+                <th>时长</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>阶段一</td>
+                <td>用<strong>正常音量</strong>说话</td>
+                <td>3 秒</td>
+            </tr>
+            <tr>
+                <td>阶段二</td>
+                <td><strong>大声喊叫</strong></td>
+                <td>3 秒</td>
+            </tr>
+            <tr>
+                <td>完成</td>
+                <td>显示校准结果，自动进入主菜单</td>
+                <td>2 秒</td>
+            </tr>
+        </tbody>
+    </table>
+    <p>校准数据会保存，后续启动不再重复。如需重新校准，可在设置中操作。</p>
+
+    <h2>4. 界面说明</h2>
+    <h3>4.1 主菜单</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>按钮</th>
+                <th>功能</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>START</strong></td>
+                <td>直接进入上次未通关的关卡（首次为第 1 关）</td>
+            </tr>
+            <tr>
+                <td><strong>LEVELS</strong></td>
+                <td>进入选关界面，可选择 1/2/3 关</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>4.2 选关界面</h3>
+    <ul>
+        <li>三个关卡按钮，颜色分别为绿（第 1 关）、橙（第 2 关）、红（第 3 关）</li>
+        <li>每个按钮下方显示该关历史最高分</li>
+        <li>点击按钮进入对应关卡</li>
+        <li>点击空白区域返回主菜单</li>
+    </ul>
+
+    <h3>4.3 游戏界面</h3>
+    <pre>
+┌──────────────────────────────┐
+│ Score: 1200     [ | | ]  暂停 │
+│ Combo x3                     │
+│                              │
+│          ★                   │
+│    🏃                        │
+│  ════════════    ════════════ │
+│                ██             │
+└──────────────────────────────┘
+    </pre>
+    <ul>
+        <li>左上角：当前分数和 Combo 连击数</li>
+        <li>右上角：暂停按钮</li>
+        <li>屏幕中央：教学提示文字（第 1、2 关）</li>
+        <li>角色：5 帧动画小人，自动向前跑</li>
+    </ul>
+
+    <h3>4.4 暂停界面</h3>
+    <ul>
+        <li>Resume/Restart/Quit 三按钮</li>
+    </ul>
+
+    <h3>4.5 死亡界面</h3>
+    <ul>
+        <li>显示 "YOU DIED" 及本局得分</li>
+        <li>Retry/Quit 两按钮</li>
+    </ul>
+
+    <h3>4.6 胜利界面</h3>
+    <ul>
+        <li>显示 "LEVEL COMPLETE" 及本局得分</li>
+        <li>如破纪录显示 "NEW RECORD!"</li>
+        <li>Next Level/Quit 两按钮</li>
+    </ul>
+
+    <h2>5. 游戏规则</h2>
+    <h3>5.1 基本规则</h3>
+    <ul>
+        <li>角色<strong>自动向右奔跑</strong>，无需操作方向</li>
+        <li>玩家通过喊叫控制跳跃：
+            <ul>
+                <li>安静 → 不跳（角色正常跑步）</li>
+                <li>小声 → 小跳（Level 1）</li>
+                <li>大声 → 中跳（Level 2）</li>
+                <li>喊叫 → 大跳（Level 3）</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h3>5.2 胜利条件</h3>
+    <ul>
+        <li>到达地图右端的金色终点线</li>
+    </ul>
+
+    <h3>5.3 死亡条件</h3>
+    <ul>
+        <li>掉入坑中（角色掉落屏幕底部）</li>
+        <li>碰到障碍物（红色火焰图标）</li>
+    </ul>
+
+    <h3>5.4 收集物品</h3>
+    <ul>
+        <li><strong>星星</strong>：触碰即收集，获得分数</li>
+    </ul>
+
+    <h2>6. 计分规则</h2>
+    <h3>6.1 Combo 连击系统</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Combo</th>
+                <th>单颗星星得分</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>第 1 颗</td>
+                <td>100 × 1 = 100</td>
+            </tr>
+            <tr>
+                <td>第 2 颗</td>
+                <td>100 × 2 = 200</td>
+            </tr>
+            <tr>
+                <td>第 3 颗</td>
+                <td>100 × 3 = 300</td>
+            </tr>
+            <tr>
+                <td>...</td>
+                <td>100 × N</td>
+            </tr>
+        </tbody>
+    </table>
+    <ul>
+        <li>连续 2 秒内收集下一颗星星 → Combo +1</li>
+        <li>超过 2 秒未收集 → Combo 归零</li>
+        <li>最高 Combo 取决于关卡星星密度</li>
+    </ul>
+
+    <h3>6.2 高分提示</h3>
+    <ul>
+        <li>尽量在连击时间窗口内连续收集星星</li>
+        <li>第 3 关 "连击天堂" 区域有 8 颗连续星星，可达 x8 Combo</li>
+    </ul>
+
+    <h2>7. 关卡介绍</h2>
+    <div class="level-card level-1">
+        <h3>7.1 第 1 关：First Steps（教学关）</h3>
+        <ul>
+            <li>长度：120 格，约 30 秒</li>
+            <li>星星：12 颗 | 障碍：4 个 | 浮空障碍：无</li>
+            <li>屏幕<strong>有中文教学提示</strong>，引导操作</li>
+            <li>学习内容：收集星星、跳过坑、躲避障碍物</li>
+        </ul>
+    </div>
+
+    <div class="level-card level-2">
+        <h3>7.2 第 2 关：Voice Control（声音控制）</h3>
+        <ul>
+            <li>长度：160 格，约 40 秒</li>
+            <li>星星：18 颗 | 障碍：8 个（含 4 个浮空障碍）</li>
+            <li>新增<strong>浮空障碍</strong>，需精准控制跳跃高度</li>
+            <li>学习内容：连续坑切换音量、浮空障碍精确跳跃</li>
+        </ul>
+    </div>
+
+    <div class="level-card level-3">
+        <h3>7.3 第 3 关：Ultimate Challenge（终极挑战）</h3>
+        <ul>
+            <li>长度：200 格，约 50 秒</li>
+            <li>星星：28 颗 | 障碍：12 个（含 6 个浮空障碍）</li>
+            <li><strong>无教学提示</strong>，独立完成</li>
+            <li>设有 "连击天堂" 区域，8 颗连续星星冲最高分</li>
+        </ul>
+    </div>
+
+    <h2>8. 特殊效果</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>效果</th>
+                <th>触发条件</th>
+                <th>表现</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>屏幕震动</strong></td>
+                <td>Level 3 跳跃</td>
+                <td>画面抖动约 0.15 秒</td>
+            </tr>
+            <tr>
+                <td><strong>Combo 文字</strong></td>
+                <td>2+ 连击</td>
+                <td>黄色 "x3!" 浮动文字</td>
+            </tr>
+            <tr>
+                <td><strong>浮空障碍晃动</strong></td>
+                <td>始终</td>
+                <td>浮空障碍物上下浮动</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>9. 常见问题</h2>
+    <div class="faq-item">
+        <div class="faq-question">Q: 为什么我小声说话也能跳很高？</div>
+        <div class="faq-answer">A: 校准阶段记录了你的个人声音范围。如需调整，可重新校准。</div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question">Q: 总在同一关死亡怎么办？</div>
+        <div class="faq-answer">A: 在选关界面选择该关重玩，或通过 LEVELS 重玩已通关的关练习。</div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question">Q: 游戏闪退？</div>
+        <div class="faq-answer">A: 确认已授予麦克风权限（系统设置 → 应用 → YellingMan → 权限）。</div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question">Q: 分数没保存？</div>
+        <div class="faq-answer">A: 只有通关才会保存分数。中途死亡不保存。</div>
+    </div>
+</body>
+</html>

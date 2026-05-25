@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YellingMan — 设计规范</title>
+    <style>
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+            margin-top: 24px;
+        }
+        h1 {
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            border-left: 4px solid #3498db;
+            padding-left: 10px;
+            margin-bottom: 16px;
+        }
+        pre {
+            background-color: #2d2d2d;
+            color: #ccc;
+            padding: 16px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 12px 0;
+            font-family: "Consolas", "Monaco", monospace;
+        }
+        code {
+            background-color: #e9ecef;
+            padding: 2px 4px;
+            border-radius: 2px;
+            font-family: "Consolas", "Monaco", monospace;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 16px 0;
+            background-color: #fff;
+        }
+        table th, table td {
+            border: 1px solid #dee2e6;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        table th {
+            background-color: #3498db;
+            color: #fff;
+        }
+        table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        .file-path {
+            color: #7f8c8d;
+            font-style: italic;
+            margin-bottom: 16px;
+        }
+        .architecture-tree {
+            font-family: "Consolas", "Monaco", monospace;
+            line-height: 1.4;
+            background-color: #f1f1f1;
+            padding: 12px;
+            border-radius: 4px;
+        }
+		
+		.arch-tree {
+		  font-family: 'Consolas', '微软雅黑', monospace;
+		  background: #f7f8fa;
+		  padding: 18px;
+		  border-radius: 8px;
+		  line-height: 1.7;
+		  color: #2c3e50;
+		}
+		.arch-tree .folder {
+		  color: #e6a23c;
+		  font-weight: bold;
+		}
+		.arch-tree .file {
+		  color: #409eff;
+		}
+		.arch-tree .comment {
+		  color: #67c23a;
+		  margin-left: 8px;
+		}
+		.arch-tree .level1 { margin-left: 0; }
+		.arch-tree .level2 { margin-left: 20px; }
+		.arch-tree .level3 { margin-left: 40px; }
+		.section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        pre {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+			color: #409eff;
+            font-family: Consolas, monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 10px 0;
+        }
+
+        .level-info {
+            font-size: 15px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+
+        .level-map {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: Consolas, monospace;
+            white-space: pre;
+            overflow-x: auto;
+            margin: 12px 0;
+            line-height: 1.4;
+        }
+
+        .area-list {
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        .hint-list {
+            background-color: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: white;
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+
+        table th {
+            background-color: #3498db;
+            color: white;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .legend {
+            display: inline-block;
+            margin: 0 8px;
+            font-weight: bold;
+        }
+        .star { color: #f1c40f; }
+        .floor { color: #2ecc71; }
+        .ob-ground { color: #e74c3c; }
+        .ob-float { color: #9b59b6; }
+        .finish { color: #e67e22; }
+    </style>
+</head>
+<body>
+    <h1>YellingMan — 设计规范</h1>
+
+    <h2>技术栈（匹配课程实验指南）</h2>
+    <ul>
+        <li>Android Java（不使用游戏引擎）</li>
+        <li>使用 <code>SurfaceView</code> + <code>Canvas</code> 进行渲染</li>
+        <li>游戏循环使用 <code>MainThread extends Thread</code></li>
+        <li>游戏对象采用 <code>CharacterSprite</code> 模式</li>
+        <li>使用 <code>AudioRecord</code> 处理麦克风输入</li>
+        <li>无后端，本地使用 SQLite 存储分数</li>
+    </ul>
+
+    <h2>核心机制：语音音量 → 跳跃力度</h2>
+    <p>提取自原始 <code>JumpLevel.java</code>：</p>
+    <pre>
+SAMPLE_RATE  = 8000 赫兹
+ENCODING     = PCM 16位
+BUFFER_SIZE  = AudioRecord.getMinBufferSize(8000, CHANNEL_IN_DEFAULT, PCM_16BIT)
+
+循环（约每50毫秒）：
+  1. 从麦克风读取 BUFFER_SIZE 个短整型数据到 buffer[]
+  2. v = 所有采样值的 buffer[i]^2 之和
+  3. 平均值 = v / 读取的采样数
+  4. 若 平均值 >= 1:  音量(分贝) = 10 * log10(平均值)
+     否则:           音量 = 0
+  5. 将分贝值映射到跳跃等级（示例，实际会根据用户个性定制化）：
+       音量 < 80    → 0级（不跳跃）
+       80 ≤ 音量 < 82 → 1级（小跳）
+       82 ≤ 音量 < 85 → 2级（中跳）
+       音量 ≥ 85      → 3级（大跳）</pre>
+
+    <h2>游戏规则（<code>GameScreen.java</code>）</h2>
+    <ul>
+        <li>角色以恒定速度自动向右奔跑</li>
+        <li>玩家通过语音音量控制<strong>跳跃高度</strong></li>
+        <li>仅当角色站在平台上时允许跳跃（地面检测）</li>
+        <li><strong>收集物</strong>：星星/爱心用于计分</li>
+        <li><strong>死亡条件</strong>：掉落至地图底部 → 游戏结束；触碰障碍物（火焰）→ 游戏结束；速度接近0（被卡住）→ 游戏结束</li>
+        <li><strong>胜利条件</strong>：到达地图右边缘 → 关卡完成</li>
+    </ul>
+
+    <h2>功能界面</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>序号</th>
+                <th>界面</th>
+                <th>描述</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td><strong>校准界面</strong></td>
+                <td>仅首次启动显示："正常说话" → "现在大喊！" → 存储个人分贝范围</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td><strong>主菜单</strong></td>
+                <td>标题"YellingMan"、开始按钮、最高分按钮、设置（重新校准）</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td><strong>关卡选择</strong></td>
+                <td>3个带锁定/解锁状态的关卡按钮，显示每个关卡的最佳分数和星级评分</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td><strong>游戏游玩</strong></td>
+                <td>Canvas 横向卷轴，支持语音跳跃 + 连击计分 + 屏幕震动</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td><strong>暂停浮层</strong></td>
+                <td>游戏中点击暂停按钮 → 浮层显示继续/重新开始/退出</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td><strong>游戏结束</strong></td>
+                <td>"你阵亡了" + 最终分数 + 连击记录，重试/菜单按钮</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td><strong>胜利界面</strong></td>
+                <td>"关卡完成" + 分数 + 星级评分，下一关/菜单按钮</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>架构（遵循实验指南模式）</h2>
+		详见<a href="架构文档.html">架构文档</a>
+
+    <h2>游戏循环流程（在 MainThread.run 中）</h2>
+    <pre>
+while (running):
+    canvas = surfaceHolder.lockCanvas()
+    synchronized (surfaceHolder):
+        gameView.update()    // 物理运算、碰撞检测、状态转换
+        gameView.draw(canvas) // 渲染当前状态
+    surfaceHolder.unlockCanvasAndPost(canvas)</pre>
+
+    <h2>关卡布局格式</h2>
+    <p>每个关卡定义如下：</p>
+    <pre>
+class LevelData {
+    int mapWidth;         // 瓦片数（原始：1000，我们使用更小值如200）
+    int tileSize;         // 每个瓦片的像素数（原始：30x36）
+    int[][] floorTiles;   // 地面层的行优先瓦片网格
+    int[] starPositions;  // 可收集星星的(x, y)坐标对
+    int[] obstaclePositions; // 障碍物的(x, y)坐标对
+    float gravity;        // 世界重力
+    float playerSpeed;    // 自动奔跑速度
+}</pre>
+    <p>关卡设计结构：开场平坦跑道 → 第一个障碍物 → 跳跃间隙 → 星星群 → 更难的障碍物 → 终点线。</p>
+
+    <h2>碰撞检测（不使用Box2D — 简单矩形运算）</h2>
+    <pre>
+// 玩家与星星碰撞
+if (rectOverlap(player.x, player.y, player.w, player.h, star.x, star.y, star.w, star.h))
+    collectStar()
+
+// 玩家与障碍物碰撞
+if (rectOverlap(player, obstacle))
+    triggerDeath()
+
+// 玩家与地面碰撞
+for each floorTile:
+    if (player standing on top of tile)
+        player.isGrounded = true
+
+// 玩家掉落
+if (player.y > mapHeight) triggerDeath()
+
+// 玩家到达终点
+if (player.x > mapWidth * tileSize) triggerVictory()</pre>
+
+    <h2>语音校准（优化特性1）</h2>
+    <p><strong>问题</strong>：固定的分贝阈值（80、82、85）并非适用于所有人。轻声的人可能永远达不到1级；大声的人可能始终触发3级。</p>
+    <p><strong>解决方案</strong>：首次启动时，在主菜单前显示一次性校准界面。</p>
+    <pre>
+校准流程：
+  1. "请正常说话3秒钟..." → 记录最小/最大分贝值
+  2. "现在尽可能大声喊！" → 记录峰值分贝值
+  3. 存储：quietDb（最小值），loudDb（最大值）
+  4. 按比例映射阈值：
+       范围 = loudDb - quietDb
+       1级阈值 = quietDb + 范围 * 0.3
+       2级阈值 = quietDb + 范围 * 0.6
+       3级阈值 = quietDb + 范围 * 0.85</pre>
+    <p><strong>实现方式</strong>：</p>
+    <ul>
+        <li><code>SoundMeter.java</code> 将 <code>quietDb</code> 和 <code>loudDb</code> 存储在 <code>SharedPreferences</code> 中</li>
+        <li>若 <code>SharedPreferences</code> 中无校准数据 → 显示 <code>CalibrationScreen</code> 状态</li>
+        <li>校准完成后，<code>getJumpLevel()</code> 使用按比例映射的阈值而非固定数值</li>
+        <li>设置中的"重新校准"按钮可重置存储的数值</li>
+    </ul>
+    <p><strong>设计价值</strong>：解决了实际的用户体验问题。体现对可访问性和边缘场景的考量，而非仅关注理想情况。</p>
+
+    <h2>连击计分（优化特性2）</h2>
+    <p><strong>问题</strong>：收集星星仅给予固定分数。缺乏持续良好表现的激励机制。</p>
+    <p><strong>解决方案</strong>：连续收集星星且不遗漏会累积连击乘数。遗漏一颗星星则重置乘数。</p>
+    <pre>
+combo = 0
+comboTimer = 2.0 (秒)
+
+每帧更新：comboTimer -= dt
+收集到星星时：
+    combo++
+    comboTimer = 2.0
+    score += starBaseValue * combo
+    显示"x{combo}"浮动文本
+
+若 comboTimer 归0：
+    combo = 0
+    comboTimer = 2.0</pre>
+    <p><strong>实现方式</strong>：</p>
+    <ul>
+        <li><code>GameView</code> 新增两个字段：<code>int comboCount</code>、<code>float comboTimer</code></li>
+        <li><code>update()</code> 递减 <code>comboTimer</code>；若 ≤0，重置 <code>comboCount</code></li>
+        <li>收集星星时：<code>comboCount++</code>、<code>comboTimer = 2.0f</code>、<code>score += 100 * comboCount</code></li>
+        <li><code>HUD.draw()</code> 在连击数>1时，在分数旁显示"x2"/"x3"</li>
+        <li>浮动连击文本：小型 <code>ComboText</code> 精灵，0.5秒内向上淡出</li>
+    </ul>
+    <p><strong>设计价值</strong>：将星星收集从"清单式任务"转变为"技能型系统"。连击+语音控制要求玩家保持稳定的发声强度以最大化分数。</p>
+
+    <h2>屏幕震动（优化特性3）</h2>
+    <p><strong>问题</strong>：游戏缺乏直观的反馈感。满级音量的大喊应带来强烈的体感。</p>
+    <p><strong>解决方案</strong>：当玩家以3级音量大喊时，整个游戏画布在数帧内随机小幅偏移，然后恢复居中。</p>
+    <pre>
+shakeDuration = 0   (剩余帧数，0=无震动)
+shakeIntensity = 5  (像素，最大偏移量)
+
+当起跳时 jumpLevel == 3：
+    shakeDuration = 8   (8帧 ≈ 60fps下的130毫秒)
+
+每帧绘制时：
+    if shakeDuration > 0:
+        offsetX = random(-shakeIntensity, +shakeIntensity)
+        offsetY = random(-shakeIntensity, +shakeIntensity)
+        canvas.translate(offsetX, offsetY)
+        shakeDuration--</pre>
+    <p><strong>实现方式</strong>：</p>
+    <ul>
+        <li><code>GameView</code> 新增两个字段：<code>int shakeFrames</code>、<code>float shakePower</code></li>
+        <li>触发3级跳跃时设置 <code>shakeFrames = 8</code></li>
+        <li>在 <code>draw()</code> 中，渲染游戏世界前，若 <code>shakeFrames > 0</code> 则应用 <code>canvas.translate()</code> 随机偏移</li>
+        <li>强度渐变：<code>currentPower = shakePower * (shakeFrames / 8.0f)</code> 实现平滑衰减</li>
+    </ul>
+    <p><strong>设计价值</strong>：对游戏手感/体验细节的理解。感知效果提升显著。注重"打磨度"和"细节关注"。</p>
+
+    <h2>精灵动画</h2>
+    <p>遵循实验指南的 <code>CharacterSprite</code> 模式：</p>
+    <ul>
+        <li>使用 <code>Bitmap.createBitmap()</code> 将精灵图分割为动画帧</li>
+        <li>动画以固定速率循环播放帧（如每帧1/12秒）</li>
+        <li><code>CharacterSprite.update()</code> 处理位置 + 速度</li>
+        <li><code>CharacterSprite.draw(Canvas)</code> 绘制当前帧</li>
+    </ul>
+
+    <h2>数据持久化</h2>
+    <ul>
+        <li>使用SQLite数据库存储高分</li>
+        <li>数据表：<code>scores(_id, level, score, date)</code></li>
+        <li>通过 <code>ScoreDBHelper extends SQLiteOpenHelper</code> 实现简单的CRUD操作</li>
+    </ul>
+	<div class="section">
+        <h2>关卡数据格式定义</h2>
+        <pre>
+class LevelData {
+    int mapWidthTiles;     // 总宽度（瓦片单位）
+    int tileSize;          // 每块瓦片像素（64px）
+    int floorY;            // 地面像素Y坐标
+    boolean[] floor;       // floor[列] = 是否存在地面
+    int[][] stars;         // [n][2] → [列, 相对地面行偏移]
+    int[][] obstacles;     // [n][2] → [列, 类型] 0=地面,1=浮空
+    int finishTile;        // 终点线所在列
+    String[] hints;        // 屏幕提示文字
+    int[] hintTiles;       // 触发提示的瓦片位置
+}
+        </pre>
+    </div>
+
+    <div class="section">
+        <h2>符号说明</h2>
+        <div>
+            <span class="legend star">★ = 星星</span>
+            <span class="legend floor">█ = 地面</span>
+            <span class="legend ob-ground">X = 地面障碍</span>
+            <span class="legend ob-float">^ = 浮空障碍</span>
+            <span class="legend finish">F = 终点</span>
+            <span class="legend">. = 坑/空中</span>
+        </div>
+    </div>
+
+    <!-- 关卡1 -->
+    <div class="section">
+        <h2>Level 1 — First Steps（教学关卡）</h2>
+        <div class="level-info">120 格 | 约30秒 | 12 颗星星 | 4 个障碍</div>
+        
+        <div class="level-map">
+tile: 0         1         2         3         4         5         6         7         8         9         10        11
+      0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
+
+上空:     *              *       *      *  *  *         X     X       *                                     *  *          F
+地面: ###############################################################################..........##############..........####
+      |-- 平地学收集 --| |小坑| |障碍教学| |中等坑| |连击入门| |大坑| |--长平地--| |冲刺|
+        </div>
+
+        <h3>区域说明</h3>
+        <ul class="area-list">
+            <li>0-21: 平地 — 星星在 tile 6, 16, 学习走路 + 收集</li>
+            <li>22-24: 2格小坑 — 可过，tile 24 有星星奖励跳跃</li>
+            <li>25-33: 障碍教学 — tile 30 地面障碍物，学习越障</li>
+            <li>34-40: 4格中坑 — 需要大跳，tiles 36,38 两颗星</li>
+            <li>41-55: 连击入门 — tiles 43,45,47 三颗星，首次Combo</li>
+            <li>56-60: 5格大坑 — 需要最大声，tile 62 星星</li>
+            <li>61-85: 长平地 — tile 68,76 障碍物，练习躲避</li>
+            <li>86-100: 平地 — tiles 91,94 两颗星</li>
+            <li>101-105: 3格坑 — 最后跳跃</li>
+            <li>106-120: 冲刺 — tile 115 到达终点</li>
+        </ul>
+
+        <h3>屏幕提示</h3>
+        <div class="hint-list">
+            tile 3 → 触碰星星收集分数<br>
+            tile 22 → 小声说话让小跳，跳过坑！<br>
+            tile 28 → 遇到障碍物！大声点跳过去！<br>
+            tile 34 → 喊大声一点！跳得更远！<br>
+            tile 43 → 连续收集星星获得 Combo 加分！<br>
+            tile 56 → 用最大声喊叫！飞跃大坑！<br>
+            tile 101→ 冲向终点！
+        </div>
+    </div>
+
+    <!-- 关卡2 -->
+    <div class="section">
+        <h2>Level 2 — Voice Control（声音控制）</h2>
+        <div class="level-info">160 格 | 约40秒 | 18 颗星星 | 8 个障碍（4地面+4浮空）</div>
+        
+        <div class="level-map">
+tile: 0         1         2         3         4         5         6         7         8         9         10        11        12        13        14        15
+      0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
+
+上空:   *   *         * *     ^     *         * * *     ^   ^     *       *       X   *     * * * *       ^       *   *       *     ^
+地面: #############..###....#####.....####....#####.....#########.....#####.......####....#######..........###########......###########...#########.......
+      |热身| |小坑| |选跳| |浮障| |三连坑| |加速段| |双浮障| |障碍星| |大坑| |连击段| |浮障大坑| |收尾|
+        </div>
+
+        <h3>区域说明</h3>
+        <ul class="area-list">
+            <li>0-16: 热身 — 平地 + 2颗分散星星</li>
+            <li>17-20: 小坑 — 2格坑，复习Level1</li>
+            <li>21-27: 选跳 — 3格+2格连续坑，切换力度</li>
+            <li>28-31: 浮空障碍 — 控制跳跃高度</li>
+            <li>32-45: 三连坑 — 2→4→3格，快速切换音量</li>
+            <li>46-55: 加速段 — 平地+3星，Combo缓冲</li>
+            <li>56-61: 双浮障 — 相邻不同高度浮空障碍</li>
+            <li>62-67: 障碍星 — 障碍物正上方有星星</li>
+            <li>68-73: 6格大坑 — 需要最大声</li>
+            <li>74-85: 连击段 — 4颗密集星星</li>
+            <li>86-95: 浮障大坑 — 5格坑+中央浮空障碍</li>
+            <li>96-120: 收尾 — 平地+2星+2浮空障碍</li>
+            <li>121-160: 终点段 — tile155到达Finish</li>
+        </ul>
+
+        <h3>屏幕提示</h3>
+        <div class="hint-list">
+            tile 5 → 准备好了吗？声音要稳！<br>
+            tile 17 → 试试控制音量跳不同距离<br>
+            tile 28 → 空中也有障碍！控制跳跃高度！<br>
+            tile 36 → 连续三个坑！调整你的声音！<br>
+            tile 52 → 两个浮空障碍！精准控制！<br>
+            tile 62 → 障碍物上方有星星！敢拿吗？<br>
+            tile 74 → 大声跳过大坑后立刻连击！<br>
+            tile 92 → 最后的挑战！浮空障碍加大坑！
+        </div>
+    </div>
+
+    <!-- 关卡3 -->
+    <div class="section">
+        <h2>Level 3 — Ultimate Challenge（终极挑战）</h2>
+        <div class="level-info">200 格 | 约50秒 | 28 颗星星 | 12 个障碍（6地面+6浮空）</div>
+        
+        <div class="level-map">
+tile: 0         1         2         3         4         5         6         7         8         9         10        11        12        13        14        15        16        17        18        19
+      01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
+
+上空: * * *       * * *     ^   X   ^       *     *     ^     *   * * * * * * * *       X ^ X ^ X       * * *     ^       *   *       * * * *     X   *   X       * * *
+地面: #########........####.....####.........#####........####.....###############........#########.........#####........####.....#######.........#############.....#########.........####
+      |群星开场| |三连坑| |混合| |浮地混| |双大坑| |浮障| |加速| |连击天堂| |X^走廊| |浮+坑| |冲刺| |星+障| |收尾|
+        </div>
+
+        <h3>区域说明</h3>
+        <ul class="area-list">
+            <li>0-15: 群星开场 — 平地+6星（3+3两组），开局Combo</li>
+            <li>16-25: 三连坑 — 2→3→4格连续坑，中间带星</li>
+            <li>26-36: 混合 — 浮空障碍+地面障碍+3格坑</li>
+            <li>37-46: 浮地混 — 地空障碍交错</li>
+            <li>47-58: 双大坑 — 5格+4格，中间一星</li>
+            <li>59-64: 浮障 — 2个浮空障碍</li>
+            <li>65-82: 加速 — 长平地喘息</li>
+            <li>83-100: 连击天堂 — 8星连续，最高x8 Combo</li>
+            <li>101-115: X^走廊 — 地空障碍5连交替</li>
+            <li>116-130: 浮+坑 — 3格坑+浮障+2格坑</li>
+            <li>131-155: 冲刺 — 平地+4星+2地面障碍</li>
+            <li>156-175: 星+障 — 星星障碍混合密集</li>
+            <li>176-200: 收尾 — 冲刺+3星，tile190到达终点</li>
+        </ul>
+
+        <h3>屏幕提示</h3>
+        <div class="hint-list">无提示，玩家独立完成</div>
+    </div>
+
+    <div class="section">
+        <h2>难度曲线对比</h2>
+        <table>
+            <tr>
+                <th></th>
+                <th>Level 1</th>
+                <th>Level 2</th>
+                <th>Level 3</th>
+            </tr>
+            <tr>
+                <td>长度</td>
+                <td>120 格</td>
+                <td>160 格</td>
+                <td>200 格</td>
+            </tr>
+            <tr>
+                <td>时间</td>
+                <td>~30秒</td>
+                <td>~40秒</td>
+                <td>~50秒</td>
+            </tr>
+            <tr>
+                <td>星星数</td>
+                <td>12颗</td>
+                <td>18颗</td>
+                <td>28颗</td>
+            </tr>
+            <tr>
+                <td>障碍数</td>
+                <td>4个</td>
+                <td>8个</td>
+                <td>12个</td>
+            </tr>
+            <tr>
+                <td>浮空障碍</td>
+                <td>无</td>
+                <td>4个</td>
+                <td>6个</td>
+            </tr>
+            <tr>
+                <td>最大坑</td>
+                <td>5格</td>
+                <td>6格</td>
+                <td>5格</td>
+            </tr>
+            <tr>
+                <td>提示</td>
+                <td>有(7条)</td>
+                <td>有(7条)</td>
+                <td>无</td>
+            </tr>
+            <tr>
+                <td>最高Combo</td>
+                <td>x3</td>
+                <td>x5</td>
+                <td>x8</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>关卡设计规律</h2>
+        <p>所有关卡遵循统一节奏：平地开场 → 首个障碍 → 跳跃坑 → 星星集群 → 高难度障碍 → 终点冲刺</p>
+    </div>
+</body>
+</html>
